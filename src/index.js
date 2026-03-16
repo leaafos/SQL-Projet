@@ -14,7 +14,10 @@ async function run() {
   console.log('='.repeat(50));
 
   // 1. Extract
-  const rawData = extract('./data/sample.json');
+  await extract('./data/Insee RP Hist 1968.csv');
+  await extract('./data/Niveaux de prix TRVG.csv');
+  await extract('./data/ORE-consommation-electrique-par-secteur-dactivite-commune_20251203_171113.csv');
+  const rawData = { users: [], posts: [] };
 
   // 2. Transform
   const cleanData = transform(rawData);

@@ -16,7 +16,7 @@ function extract(filePath, previewCount = 3) {
     throw new Error('Format de fichier non supporté : ' + ext);
   }
 
-  // Utilisation d'un stream pour le troisièe fichier qui était trop gros pour être chargé 
+  // Utilisation d'un stream pour le troisième fichier qui était trop gros pour être chargé 
   const { parse } = require('csv-parse');
   const stream = fs.createReadStream(absolutePath);
   let count = 0;
