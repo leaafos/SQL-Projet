@@ -15,6 +15,20 @@ function getDb() {
   });
 }
 
+async function insertInBatches(db, rows, label) {
+  if (!rows || rows.length === 0) return;
+
+  const nbCols = Object.keys(rows[0]).length;
+  const chunkSize = Math.floor(999 / nbCols) || 1;
+
+  for (let i = 0; i < rows.length; i += chunkSize) {
+    const chunk = rows.slice(i, i + chunkSize);
+    await db('consommation_gaz').insert(chunk);
+  }
+
+  console.log(`   ➜ ${rows.length} lignes ${label} insérées`);
+}
+
 async function load(data) {
   const db = getDb();
 
@@ -25,22 +39,10 @@ async function load(data) {
     await db('consommation_gaz').del();
     console.log('   ➜ Table consommation_gaz vidée');
 
-    // Insérer les données Insee
-    if (data.inseeData && data.inseeData.length > 0) {
-      await db('consommation_gaz').insert(data.inseeData);
-      console.log(`   ➜ ${data.inseeData.length} lignes Insee insérées`);
-    }
-
-    // Insérer les données Prix
-    if (data.prixData && data.prixData.length > 0) {
-      await db('consommation_gaz').insert(data.prixData);
-      console.log(`   ➜ ${data.prixData.length} lignes Prix insérées`);
-    }
-
-    // Insérer les données ORE
-    if (data.oreData && data.oreData.length > 0) {
-      await db('consommation_gaz').insert(data.oreData);
-      console.log(`   ➜ ${data.oreData.length} lignes ORE insérées`);
+    if (data.mergedData && data.mergedData.length > 0) {
+      await insertInBatches(db, data.mergedData, 'merged');
+    } else {
+      console.log('   ➜ Aucune donnée à insérer (merge vide)');
     }
 
     // Vérification : compter les lignes

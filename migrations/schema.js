@@ -19,7 +19,7 @@ async function createTables() {
       table.increments('id').primary();
 
       table.string('commune');
-      table.string('code_postal').notNullable();
+      table.string('code_postal');
 
       table.integer('niveau_prix');
 
@@ -30,6 +30,7 @@ async function createTables() {
 
       table.float('consommation_totale');
       table.float('consommation_moyenne');
+      table.string('gaz');
 
       table.timestamps(true, true);
     });

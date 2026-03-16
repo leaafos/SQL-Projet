@@ -2,6 +2,7 @@ const { extract } = require('./extract/index_csv');
 const { transform: transformInsee } = require('./transform/transform_insee');
 const { transform: transformPrix } = require('./transform/transform_prix');
 const { transform: transformOre } = require('./transform/transform_ore');
+const { transformMerge } = require('./transform/transform_merge');
 const { load } = require('./load/index');
 
 /**
@@ -16,17 +17,20 @@ async function run() {
   console.log('='.repeat(50));
 
   // 1. Extract
-  const rawInsee = await extract('./data/Insee RP Hist 1968.csv');
+  const rawInsee = await extract('./data/Insee RP Hist 1968.csv', { fromLine: 5 });
   const rawPrix = await extract('./data/Niveaux de prix TRVG.csv');
-  const rawOre = await extract('./data/ORE-consommation-electrique-par-secteur-dactivite-commune_20251203_171113.csv');
+  const rawOre = await extract('./data/ORE-consommation-electrique-par-secteur-dactivite-commune_20251203_171113.csv', { filter: { FILIERE: 'Gaz' } });
 
   // 2. Transform
   const inseeData = transformInsee(rawInsee);
   const prixData = transformPrix(rawPrix);
   const oreData = transformOre(rawOre);
 
+  // 2b. Merge — assembler les 3 datasets par code_insee
+  const mergedData = transformMerge(inseeData, prixData, oreData);
+
   // 3. Load
-  await load({ inseeData, prixData, oreData });
+  await load({ mergedData });
 
   console.log('\n' + '='.repeat(50));
   console.log('🎉 Pipeline ETL terminé avec succès !');

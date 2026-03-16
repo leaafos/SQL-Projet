@@ -1,14 +1,14 @@
-
 const fs = require('fs');
 const path = require('path');
-const csv = require('csv-parse/sync');
 
 
 /**
- * EXTRACT — Lit les données brutes depuis un fichier JSON ou CSV
+ * EXTRACT — Lit les données brutes depuis un fichier CSV
  */
-function extract(filePath) {
+function extract(filePath, options = {}) {
   console.log('📥 [EXTRACT] Lecture du fichier :', filePath);
+
+  const { filter, fromLine = 1 } = options;
 
   const absolutePath = path.resolve(filePath);
   const ext = path.extname(absolutePath).toLowerCase();
@@ -16,19 +16,29 @@ function extract(filePath) {
     throw new Error('Format de fichier non supporté : ' + ext);
   }
 
-  // Utilisation d'un stream pour lire toutes les lignes
   const { parse } = require('csv-parse');
+  const fd = fs.openSync(absolutePath, 'r');
+  const probeBuffer = Buffer.alloc(2048);
+  const bytesRead = fs.readSync(fd, probeBuffer, 0, 2048, 0);
+  fs.closeSync(fd);
+  const firstLine = probeBuffer.toString('utf-8', 0, bytesRead).split(/\r?\n/)[0] || '';
+  const delimiter = firstLine.includes(';') ? ';' : ',';
+
   const stream = fs.createReadStream(absolutePath);
   let allData = [];
 
   return new Promise((resolve, reject) => {
     stream
-      .pipe(parse({ columns: true, skip_empty_lines: true }))
+      .pipe(parse({ columns: true, skip_empty_lines: true, delimiter, bom: true, from_line: fromLine }))
       .on('data', (row) => {
+        if (filter) {
+          const match = Object.entries(filter).every(([col, val]) => row[col] === val);
+          if (!match) return;
+        }
         allData.push(row);
       })
       .on('end', () => {
-        console.log(`   ➜ ${allData.length} lignes extraites (CSV)`);
+        console.log(`   ➜ ${allData.length} lignes extraites (CSV)${filter ? ' [filtré]' : ''}`);
         resolve(allData);
       })
       .on('error', (err) => {
@@ -38,21 +48,3 @@ function extract(filePath) {
 }
 
 module.exports = { extract };
-
-if (require.main === module) {
-  const csvFiles = [
-    './data/Insee RP Hist 1968.csv',
-    './data/Niveaux de prix TRVG.csv',
-    './data/ORE-consommation-electrique-par-secteur-dactivite-commune_20251203_171113.csv'
-  ];
-  (async () => {
-    for (const file of csvFiles) {
-      try {
-        const preview = await extract(file);
-        console.log(preview);
-      } catch (err) {
-        console.error('Erreur lors de l\'extraction :', err.message);
-      }
-    }
-  })();
-}
