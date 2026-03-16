@@ -1,0 +1,22 @@
+{
+  "name": "wsf-4edata",
+  "version": "1.0.0",
+  "description": "Projet Node.js avec Knex",
+  "main": "index.js",
+  "scripts": {
+    "migrate": "node migrations/schema.js",
+    "etl": "node src/etl.js"
+  },
+  "dependencies": {
+    "knex": "^3.1.0",
+    "better-sqlite3": "^11.0.0"
+  },
+  "database": {
+    "client": "better-sqlite3",
+    "host": "127.0.0.1",
+    "port": 3306,
+    "user": "root",
+    "password": "",
+    "database": "wsf_4edata"
+  }
+}

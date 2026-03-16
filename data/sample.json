@@ -1,0 +1,16 @@
+{
+  "users": [
+    { "name": "Alice Dupont", "email": "alice@example.com", "password": "alice123" },
+    { "name": "Bob Martin", "email": "bob@example.com", "password": "bob456" },
+    { "name": "Clara Leroy", "email": "clara@example.com", "password": "clara789" },
+    { "name": "David Moreau", "email": "david@example.com", "password": "david012" },
+    { "name": "Emma Bernard", "email": "emma@example.com", "password": "emma345" }
+  ],
+  "posts": [
+    { "title": "Introduction à Node.js", "content": "Node.js est un environnement d'exécution JavaScript côté serveur.", "user_email": "alice@example.com" },
+    { "title": "Les bases de SQL", "content": "SQL permet de manipuler et interroger des bases de données relationnelles.", "user_email": "bob@example.com" },
+    { "title": "Comprendre les API REST", "content": "Une API REST utilise les méthodes HTTP pour communiquer entre client et serveur.", "user_email": "clara@example.com" },
+    { "title": "ETL en pratique", "content": "ETL signifie Extract, Transform, Load — un processus clé en data engineering.", "user_email": "david@example.com" },
+    { "title": "JavaScript moderne", "content": "ES6+ apporte les arrow functions, le destructuring et les template literals.", "user_email": "emma@example.com" }
+  ]
+}
