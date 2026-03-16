@@ -1,4 +1,4 @@
-const { extract } = require('./extract/index');
+const { extract } = require('./extract/index_csv');
 const { transform } = require('./transform/index');
 const { load } = require('./load/index');
 
