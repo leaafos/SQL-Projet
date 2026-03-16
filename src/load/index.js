@@ -21,23 +21,31 @@ async function load(data) {
   console.log('\n💾 [LOAD] Chargement en base de données...');
 
   try {
-    // Vider les tables avant insertion (ordre important pour les FK)
-    await db('posts').del();
-    await db('users').del();
-    console.log('   ➜ Tables vidées');
+    // Vider la table avant insertion
+    await db('consommation_gaz').del();
+    console.log('   ➜ Table consommation_gaz vidée');
 
-    // Insérer les users
-    await db('users').insert(data.users);
-    console.log(`   ➜ ${data.users.length} users insérés`);
+    // Insérer les données Insee
+    if (data.inseeData && data.inseeData.length > 0) {
+      await db('consommation_gaz').insert(data.inseeData);
+      console.log(`   ➜ ${data.inseeData.length} lignes Insee insérées`);
+    }
 
-    // Insérer les posts
-    await db('posts').insert(data.posts);
-    console.log(`   ➜ ${data.posts.length} posts insérés`);
+    // Insérer les données Prix
+    if (data.prixData && data.prixData.length > 0) {
+      await db('consommation_gaz').insert(data.prixData);
+      console.log(`   ➜ ${data.prixData.length} lignes Prix insérées`);
+    }
 
-    // Vérification : relire les données
-    const usersCount = await db('users').count('id as count').first();
-    const postsCount = await db('posts').count('id as count').first();
-    console.log(`\n📊 Vérification : ${usersCount.count} users, ${postsCount.count} posts en base`);
+    // Insérer les données ORE
+    if (data.oreData && data.oreData.length > 0) {
+      await db('consommation_gaz').insert(data.oreData);
+      console.log(`   ➜ ${data.oreData.length} lignes ORE insérées`);
+    }
+
+    // Vérification : compter les lignes
+    const totalCount = await db('consommation_gaz').count('id as count').first();
+    console.log(`\n📊 Vérification : ${totalCount.count} lignes en base`);
 
   } finally {
     await db.destroy();

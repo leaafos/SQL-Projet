@@ -18,7 +18,7 @@ async function createTables() {
     await db.schema.createTable('consommation_gaz', (table) => {
       table.increments('id').primary();
 
-      table.string('commune').notNullable();
+      table.string('commune');
       table.string('code_postal').notNullable();
 
       table.integer('niveau_prix');

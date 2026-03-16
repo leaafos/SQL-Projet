@@ -7,7 +7,7 @@ const csv = require('csv-parse/sync');
 /**
  * EXTRACT — Lit les données brutes depuis un fichier JSON ou CSV
  */
-function extract(filePath, previewCount = 3) {
+function extract(filePath) {
   console.log('📥 [EXTRACT] Lecture du fichier :', filePath);
 
   const absolutePath = path.resolve(filePath);
@@ -16,26 +16,20 @@ function extract(filePath, previewCount = 3) {
     throw new Error('Format de fichier non supporté : ' + ext);
   }
 
-  // Utilisation d'un stream pour le troisième fichier qui était trop gros pour être chargé 
+  // Utilisation d'un stream pour lire toutes les lignes
   const { parse } = require('csv-parse');
   const stream = fs.createReadStream(absolutePath);
-  let count = 0;
-  let preview = [];
-  let total = 0;
+  let allData = [];
 
   return new Promise((resolve, reject) => {
     stream
       .pipe(parse({ columns: true, skip_empty_lines: true }))
       .on('data', (row) => {
-        total++;
-        if (count < previewCount) {
-          preview.push(row);
-          count++;
-        }
+        allData.push(row);
       })
       .on('end', () => {
-        console.log(`   ➜ ${total} lignes extraites (CSV)`);
-        resolve(preview);
+        console.log(`   ➜ ${allData.length} lignes extraites (CSV)`);
+        resolve(allData);
       })
       .on('error', (err) => {
         reject(err);
@@ -47,9 +41,9 @@ module.exports = { extract };
 
 if (require.main === module) {
   const csvFiles = [
-    '../../data/Insee RP Hist 1968.csv',
-    '../../data/Niveaux de prix TRVG.csv',
-    '../../data/ORE-consommation-electrique-par-secteur-dactivite-commune_20251203_171113.csv'
+    './data/Insee RP Hist 1968.csv',
+    './data/Niveaux de prix TRVG.csv',
+    './data/ORE-consommation-electrique-par-secteur-dactivite-commune_20251203_171113.csv'
   ];
   (async () => {
     for (const file of csvFiles) {
